@@ -12,11 +12,13 @@ Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
 ## Map
 - `extension.js` — manifest: card entries and `page.source` (`./src/pages/router.jsx`)
 - `src/cards/` — card components, each wrapped in `QueryProvider`
-- `src/pages/` — page router (react-router v5), `Home.jsx`, segment codec
+- `src/pages/` — page router (react-router v5), `Home.jsx` (search, `?bannerId=` sync, notices), segment codec
+- `src/components/xmommst/` — records table, record dialog (TanStack Form), delete confirmation
 - `src/domain/` — pure logic + `*.test.mjs`: Banner ID, access, person, record rows, form rules F1–F9 (`src/domain/recordForm.js`)
 - `src/api/endpoints.js` — pipeline names, URLs, `MOCK` flags (flip one per live pipeline)
 - `src/mocks/` — fixtures (`MOCK_IDS`: with records, none, write fails, unknown) + in-memory store
-- `src/hooks/` — Ethos/Data Connect fetch hooks (`useEthosQuery`, `useMockableEthosQuery`, …)
+- `src/hooks/` — fetch hooks; `src/hooks/useXmommst.js` (person, records, codes, writes with mock switch), `src/hooks/useXmommstAccess.js` (card roles)
+- `src/api/http.js` — `readJsonResponse`: empty 2xx → null, errors → contract `{ message }`
 - `src/contexts/QueryProvider.jsx` — one TanStack `QueryClient` per entry bundle
 - `src/components/examples/` — verified EDS usage examples; copy from them
 - `.github/copilot-instructions.md` — house rules (EDS only, TanStack Query, Zustand, no `fetch`)
