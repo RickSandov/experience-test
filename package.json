@@ -18,10 +18,13 @@
     "@ellucian/ds-icons": "https://cdn.elluciancloud.com/assets/EDS2/8.6.0/umd/path_design_system_icons.tgz",
     "@ellucian/experience-extension-utils": "https://cdn.elluciancloud.com/assets/SDK/utils/1.1.0/ellucian-experience-extension-utils-1.1.0.tgz",
     "@ellucian/react-design-system": "https://cdn.elluciancloud.com/assets/EDS2/8.6.0/umd/path_design_system.tgz",
+    "@tanstack/react-form": "^1.33.5",
+    "@tanstack/react-query": "^5.108.0",
     "react": "19.0.3",
     "react-dom": "19.0.3",
     "react-intl": "7.1.11",
-    "react-router-dom": "5.2.0"
+    "react-router-dom": "5.2.0",
+    "zustand": "^5.1.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "7.12.1",
