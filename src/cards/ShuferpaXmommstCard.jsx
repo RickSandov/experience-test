@@ -1,5 +1,6 @@
 import { spacing40 } from '@ellucian/react-design-system/core/styles/tokens';
 import { makeStyles, Typography, TextLink } from '@ellucian/react-design-system/core';
+import QueryProvider from '../contexts/QueryProvider';
 
 const useStyles = makeStyles()({
     card: {
@@ -7,7 +8,7 @@ const useStyles = makeStyles()({
     }
 });
 
-const ShuferpaXmommstCard = () => {
+const ShuferpaXmommstCardContent = () => {
     const { classes } = useStyles();
 
     return (
@@ -26,5 +27,11 @@ const ShuferpaXmommstCard = () => {
         </div>
     );
 };
+
+const ShuferpaXmommstCard = (props) => (
+    <QueryProvider>
+        <ShuferpaXmommstCardContent {...props} />
+    </QueryProvider>
+);
 
 export default ShuferpaXmommstCard;

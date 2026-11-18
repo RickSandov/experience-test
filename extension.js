@@ -13,7 +13,7 @@ module.exports = {
         }
     }],
     page: {
-        source: './src/page/router.jsx',
+        source: './src/pages/router.jsx',
         applyCardRoles: true
     }
 };

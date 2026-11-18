@@ -23,7 +23,8 @@ export default [
   reactHooksPlugin.configs['recommended-latest'],
   { ignores: ['dist/', 'extension.js'] },
   {
-    files: ["**/*.js", "**/*.jsx"],
+    // .mjs: node --test files; without this they get eslint-plugin-import's ES2018 parser.
+    files: ["**/*.js", "**/*.jsx", "**/*.mjs"],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
@@ -35,7 +36,8 @@ export default [
         document: 'readonly',
         navigator: 'readonly',
         process: 'readonly',
-        console: 'readonly'
+        console: 'readonly',
+        URLSearchParams: 'readonly',
       }
     },
     settings: {
