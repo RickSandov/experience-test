@@ -7,7 +7,7 @@ Read on every turn of every session in this repo: keep it under 4 KB. Point to s
 ## Purpose
 Ellucian Experience extension (card + page) to manage Banner form XMOMMST records by
 Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
-(awaiting approval). Nothing is deployed.
+(approved). Nothing is deployed.
 
 ## Map
 - `extension.js` — manifest: card entries and `page.source` (`./src/pages/router.jsx`)
