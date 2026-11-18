@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { EMPTY_VALUE } from './format.js';
-import { cleanDate, codeLabel, toRecordRow } from './records.js';
+import { cleanDate, codeLabel, toRecordRow, upsertRecord, removeRecord, isRecord } from './records.js';
 
 const REL = [
     { zmomrelRelCode: 'M', zmomrelDesc: 'Mother' },
@@ -85,4 +85,41 @@ test('the relationship description shows only for Other', () => {
 test('a row keeps the raw record for edit and delete', () => {
     const raw = record();
     assert.equal(toRecordRow(raw, LOOKUPS).record, raw);
+});
+
+test('upsertRecord replaces the record with the same id in place', () => {
+    const list = [record({ id: 'a', xmommstName: 'Old' }), record({ id: 'b' })];
+    const next = upsertRecord(list, record({ id: 'a', xmommstName: 'New' }));
+    assert.deepEqual(next.map((r) => [r.id, r.xmommstName]), [['a', 'New'], ['b', 'Javier Sandoval']]);
+});
+
+test('upsertRecord appends a record with a new id', () => {
+    const next = upsertRecord([record({ id: 'a' })], record({ id: 'c' }));
+    assert.deepEqual(next.map((r) => r.id), ['a', 'c']);
+});
+
+test('upsertRecord does not mutate the cached list', () => {
+    const list = [record({ id: 'a' })];
+    upsertRecord(list, record({ id: 'c' }));
+    assert.equal(list.length, 1);
+});
+
+test('upsertRecord on a list that is not loaded starts a new list', () => {
+    assert.deepEqual(upsertRecord(undefined, record({ id: 'a' })).map((r) => r.id), ['a']);
+});
+
+test('removeRecord drops only the record with that id', () => {
+    const next = removeRecord([record({ id: 'a' }), record({ id: 'b' })], 'a');
+    assert.deepEqual(next.map((r) => r.id), ['b']);
+});
+
+test('removeRecord on a list that is not loaded leaves it unloaded', () => {
+    assert.equal(removeRecord(undefined, 'a'), undefined);
+});
+
+test('isRecord accepts a response with an id and rejects empty responses', () => {
+    assert.equal(isRecord(record()), true);
+    assert.equal(isRecord({}), false);
+    assert.equal(isRecord(null), false);
+    assert.equal(isRecord([record()]), false);
 });

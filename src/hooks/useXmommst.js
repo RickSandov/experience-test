@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MOCK, PIPELINES, usernameUrl, zmommstUrl } from '../api/endpoints';
 import { readJsonResponse } from '../api/http';
+import { isRecord, removeRecord, upsertRecord } from '../domain/records';
 import { mockStore, withMockDelay } from '../mocks';
 import useConfiguredEthosFetch from './useConfiguredEthosFetch';
 import useMockableEthosQuery from './useMockableEthosQuery';
@@ -62,7 +63,8 @@ const MOCK_WRITES = {
 };
 
 /**
- * Create, update or delete an XMOMMST record, then refetch that Banner ID's list.
+ * Create, update or delete an XMOMMST record, then update that Banner ID's cached
+ * list from the response (no refetch unless the response is empty).
  * `mutateAsync({ method: 'POST'|'PUT'|'DELETE', body })`; errors carry the
  * contract's `{ message }`.
  * @param {string} bannerId
@@ -83,6 +85,17 @@ export function useRecordWrite(bannerId) {
             });
             return readJsonResponse(response);
         },
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: recordsKey(bannerId) })
+        // Put the pipeline's answer straight into the cached list (live and mock keys
+        // share the prefix). A write that answers with an empty body falls back to a refetch.
+        onSuccess: (data, { method, body }) => {
+            const queryKey = recordsKey(bannerId);
+            if (method === 'DELETE') {
+                queryClient.setQueriesData({ queryKey }, (list) => removeRecord(list, body.id));
+            } else if (isRecord(data)) {
+                queryClient.setQueriesData({ queryKey }, (list) => upsertRecord(list, data));
+            } else {
+                queryClient.invalidateQueries({ queryKey });
+            }
+        }
     });
 }

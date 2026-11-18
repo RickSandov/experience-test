@@ -47,3 +47,30 @@ export function toRecordRow(record, { rel, acc } = {}) {
         record
     };
 }
+
+/**
+ * Whether a write response is a record (POST/PUT answer with the saved record; the
+ * contract also allows an empty body).
+ * @param {unknown} value
+ */
+export const isRecord = (value) => Boolean(value) && typeof value === 'object' && Boolean(value.id);
+
+/**
+ * The cached list with `record` replacing the one with the same id, or appended.
+ * Returns a new array; the cached one is never mutated.
+ * @param {object[]|undefined} list
+ * @param {object} record
+ */
+export function upsertRecord(list, record) {
+    const current = Array.isArray(list) ? list : [];
+    const index = current.findIndex((item) => item.id === record.id);
+    if (index < 0) return [...current, record];
+    return current.map((item, i) => (i === index ? record : item));
+}
+
+/**
+ * The cached list without the record with `id`; an unloaded list stays unloaded.
+ * @param {object[]|undefined} list
+ * @param {string} id
+ */
+export const removeRecord = (list, id) => (Array.isArray(list) ? list.filter((item) => item.id !== id) : list);
