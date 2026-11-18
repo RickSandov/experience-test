@@ -146,7 +146,7 @@ None in this repo. Data lives in Banner; the user builds/owns the pipelines.
 ## Interfaces
 
 Pipelines, called by bare name through `useConfiguredEthosFetch` (adds `cardId`,
-`cardPrefix`). Full contract: `docs/api/xmommst.openapi.yaml` (next step).
+`cardPrefix`). Full contract: `docs/api/xmommst.openapi.yaml`.
 
 | Pipeline | Method | Input | 200 response |
 |---|---|---|---|
