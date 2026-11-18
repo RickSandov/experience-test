@@ -87,6 +87,10 @@ Rulings (decided here; change any before approval):
   description is trimmed; blank counts as missing. Cost if wrong: one line.
 - **Ruling: the apostrophe in F4/F5 accepts both `'` and `’`** (the rule was written
   with a typographic `’`; keyboards type `'`). Cost if wrong: one character.
+- **Browser validation stays on** (user, 2026-11-18): the form keeps native
+  `required`/`pattern`/`minLength` checks, so the browser blocks an invalid name
+  before F5 runs; F5's code check and 10-second message are a backstop, not the
+  primary path. No `noValidate`.
 - **Ruling: Banner ID in the URL** (`?bannerId=12636344`) so a reload or shared link
   reopens the same person. Cost if wrong: drop the sync.
 - **Ruling: status is a string** `"true"`/`"false"` on the wire (as in the samples);
