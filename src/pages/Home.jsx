@@ -5,6 +5,7 @@ import {
     Button,
     CircularProgress,
     INLINE_VARIANT,
+    PAGE_VARIANT,
     TextField,
     Typography,
     makeStyles
@@ -16,8 +17,11 @@ import { isValidBannerId, normalizeBannerIdInput } from '../domain/bannerId';
 import { isPersonFound, personHeading } from '../domain/person';
 import { toRecordRow } from '../domain/records';
 import RecordsTable from '../components/xmommst/RecordsTable';
+import RecordDialog from '../components/xmommst/RecordDialog';
+import DeleteRecordDialog from '../components/xmommst/DeleteRecordDialog';
 
 const SEARCH_DELAY_MS = 500;
+const NOTICE_MS = 6000;
 const EMPTY_LIST_TEXT = 'This user has not yet granted any individuals FERPA authorization.';
 
 const useStyles = makeStyles({ name: 'XmommstHome' })(() => ({
@@ -60,9 +64,12 @@ const HomePage = () => {
         [records.data, rel, acc]
     );
 
-    // Dialogs are wired in the next unit; until then the actions are no-ops.
-    const [, setEditing] = useState(null);
-    const [, setDeleting] = useState(null);
+    // editing: null (closed), {} (new record) or the record being edited.
+    const [editing, setEditing] = useState(null);
+    const [deleting, setDeleting] = useState(null);
+    const [notice, setNotice] = useState(null);
+    const notify = ({ alertType, text, autoHideDuration = NOTICE_MS }) =>
+        setNotice({ alertType, text, autoHideDuration, key: Date.now() });
 
     if (!canRead) {
         return (
@@ -131,6 +138,35 @@ const HomePage = () => {
                 fullWidth
             />
             {renderResult()}
+            {editing && (
+                <RecordDialog
+                    key={editing.id ?? 'new'}
+                    bannerId={bannerId}
+                    record={editing.id ? editing : undefined}
+                    onClose={() => setEditing(null)}
+                    notify={notify}
+                />
+            )}
+            {deleting && (
+                <DeleteRecordDialog
+                    bannerId={bannerId}
+                    record={deleting}
+                    onClose={() => setDeleting(null)}
+                    notify={notify}
+                />
+            )}
+            {notice && (
+                <Alert
+                    key={notice.key}
+                    alertType={notice.alertType}
+                    autoHideDuration={notice.autoHideDuration}
+                    id="XmommstHome_Notice"
+                    onClose={() => setNotice(null)}
+                    open
+                    text={notice.text}
+                    variant={PAGE_VARIANT}
+                />
+            )}
         </div>
     );
 };
