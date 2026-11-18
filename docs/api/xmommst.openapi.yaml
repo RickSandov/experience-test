@@ -1,0 +1,262 @@
+openapi: 3.0.3
+info:
+  title: XMOMMST admin pipelines
+  version: 1.0.0
+  description: |
+    Data Connect pipelines used by the shuferpa-xmommst Experience extension.
+    Design: docs/superpowers/specs/2026-11-18-xmommst-admin-design.md
+
+    - The extension calls each pipeline by bare name through authenticatedEthosFetch
+      (no leading slash). The paths below are the pipeline names.
+    - Every call also carries `cardId` and `cardPrefix` query params (added by the
+      extension's fetch hook); pipelines may ignore them.
+    - No pagination: lists are returned as plain arrays.
+    - Errors: any failure answers status >= 400 with `{ "message": "..." }`. A 200 is
+      always a success; never answer 200 with an error payload.
+    - Dates are `YYYY-MM-DD` strings. `xmommstStatus` is the string "true" or "false".
+    - The backend owns `id` (on create), the three dates, `xmommstLastUpdatedBy` and
+      the status default on create (active).
+
+paths:
+  shu-admin-get-username:
+    get:
+      summary: Name of the person with a Banner ID
+      parameters:
+        - $ref: '#/components/parameters/BannerId'
+      responses:
+        '200':
+          description: The person's name, or `{}` when the Banner ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonName'
+              examples:
+                found:
+                  value: { firstName: Ricardo Javier, lastName: Sandoval }
+                notFound:
+                  value: {}
+        default:
+          $ref: '#/components/responses/Error'
+
+  shu-admin-get-zmommst:
+    get:
+      summary: XMOMMST records of a Banner ID
+      parameters:
+        - $ref: '#/components/parameters/BannerId'
+      responses:
+        '200':
+          description: All records for the Banner ID (active and inactive); `[]` when none.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/XmommstRecord'
+        default:
+          $ref: '#/components/responses/Error'
+
+  shu-get-zmomrel:
+    get:
+      summary: Relationship codes
+      responses:
+        '200':
+          description: All relationship codes. The extension hides codes D and E.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RelationshipCode'
+        default:
+          $ref: '#/components/responses/Error'
+
+  shu-get-zmomacc:
+    get:
+      summary: Access (scope) codes
+      responses:
+        '200':
+          description: All access codes. The extension hides codes D and E.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccessCode'
+        default:
+          $ref: '#/components/responses/Error'
+
+  shu-admin-post-zmommst:
+    post:
+      summary: Create a record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRecord'
+      responses:
+        '200':
+          description: Created. Body is the created record, or empty.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/XmommstRecord'
+        '201':
+          description: Created (same as 200).
+        default:
+          $ref: '#/components/responses/Error'
+
+  shu-admin-put-zmommst:
+    put:
+      summary: Update a record
+      description: |
+        The extension sends the full record. Dates and `xmommstLastUpdatedBy` are
+        echoed as received; the backend decides their new values (for example
+        `xmommstInactiveDt` when status turns "false").
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/XmommstRecord'
+      responses:
+        '200':
+          description: Updated. Body is the updated record, or empty.
+        '204':
+          description: Updated, no body.
+        default:
+          $ref: '#/components/responses/Error'
+
+  shu-delete-zmommst:
+    delete:
+      summary: Delete a record (hard delete)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id]
+              properties:
+                id: { type: string, format: uuid }
+      responses:
+        '200':
+          description: Deleted. Body empty or `{}`.
+        '204':
+          description: Deleted, no body.
+        default:
+          $ref: '#/components/responses/Error'
+
+components:
+  parameters:
+    BannerId:
+      name: bannerId
+      in: query
+      required: true
+      description: 8-digit Banner ID.
+      schema:
+        type: string
+        pattern: '^\d{8}$'
+        example: '12636344'
+
+  responses:
+    Error:
+      description: Any failure (status >= 400).
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [message]
+            properties:
+              message: { type: string, example: Record not found }
+
+  schemas:
+    PersonName:
+      type: object
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+
+    RelationshipCode:
+      type: object
+      required: [zmomrelRelCode, zmomrelDesc]
+      properties:
+        zmomrelRelCode: { type: string, example: M }
+        zmomrelDesc: { type: string, example: Mother }
+        id: { type: string, format: uuid }
+
+    AccessCode:
+      type: object
+      required: [zmomaccAccCode, zmomaccDesc]
+      properties:
+        zmomaccAccCode: { type: string, example: B }
+        zmomaccDesc: { type: string, example: Billing }
+        id: { type: string, format: uuid }
+
+    EditableFields:
+      type: object
+      required: [xbannerId, xmommstRelCode, xmommstName, xmommstAccCode, xmommstPin, xmommstMessage]
+      properties:
+        xbannerId:
+          type: string
+          pattern: '^\d{8}$'
+        xmommstRelCode:
+          type: string
+          description: A zmomrelRelCode.
+        xmommstMessage:
+          type: string
+          description: |
+            Relationship description. Non-blank when xmommstRelCode is "O" (Other);
+            "" otherwise (an update away from "O" clears it).
+        xmommstName:
+          type: string
+          pattern: "^[A-Za-z'’. -]+$"
+          description: Parent/guardian name, trimmed.
+        xmommstAccCode:
+          type: string
+          description: A zmomaccAccCode.
+        xmommstPin:
+          type: string
+          pattern: '^\d{4}$'
+
+    CreateRecord:
+      allOf:
+        - $ref: '#/components/schemas/EditableFields'
+      example:
+        xbannerId: '12636344'
+        xmommstRelCode: O
+        xmommstMessage: Aunt
+        xmommstName: Javier Calderon
+        xmommstAccCode: B
+        xmommstPin: '1234'
+
+    XmommstRecord:
+      allOf:
+        - $ref: '#/components/schemas/EditableFields'
+        - type: object
+          required: [id, xmommstStatus, xmommstCreatedDt, xmommstLastActivityDt, xmommstLastUpdatedBy]
+          properties:
+            id: { type: string, format: uuid }
+            xmommstStatus:
+              type: string
+              enum: ['true', 'false']
+            xmommstCreatedDt: { type: string, format: date }
+            xmommstLastActivityDt: { type: string, format: date }
+            xmommstInactiveDt:
+              type: string
+              format: date
+              description: Present only when the record is inactive.
+            xmommstLastUpdatedBy: { type: string }
+      example:
+        id: 301dc70a-bbae-4ec0-aaa7-07bb7c26a68d
+        xbannerId: '12636344'
+        xmommstRelCode: M
+        xmommstMessage: ''
+        xmommstName: Javier Calderon
+        xmommstAccCode: B
+        xmommstPin: '1234'
+        xmommstStatus: 'false'
+        xmommstCreatedDt: '2026-11-18'
+        xmommstLastActivityDt: '2026-11-18'
+        xmommstInactiveDt: '2026-11-18'
+        xmommstLastUpdatedBy: Ricardo Javier Sandoval

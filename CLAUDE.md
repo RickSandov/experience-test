@@ -42,4 +42,4 @@ Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
 - Skill `experience-extension` (`~/.claude/skills/experience-extension/SKILL.md` and its reference folder);
   Copilot copy without Claude-only steps: `.github/skills/experience-extension/`
 - Pipeline samples: `../samples/` (request/response JSON and the role hook `../samples/useRoleAccess.js`)
-- API contracts: `docs/api/*.openapi.yaml` (to be written after the spec)
+- API contract: `docs/api/xmommst.openapi.yaml` (the user builds the pipelines from it)
