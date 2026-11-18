@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { readJsonResponse } from '../api/http';
 import useConfiguredEthosFetch from './useConfiguredEthosFetch';
 
 /**
@@ -15,17 +16,14 @@ export default function useEthosMutation({ invalidateKeys, onSuccess, ...options
     return useMutation({
         mutationFn: async ({ url, method = 'POST', body, ...fetchOptions }) => {
             const response = await authenticatedEthosFetch(url, {
+                ...fetchOptions,
                 method,
-                headers: { 'Content-Type': 'application/json', ...fetchOptions.headers },
-                body: body !== undefined ? JSON.stringify(body) : undefined,
-                ...fetchOptions
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...fetchOptions.headers },
+                body: body !== undefined ? JSON.stringify(body) : undefined
             });
 
-            if (!response || response.status >= 400) {
-                throw new Error(`Error calling ${method} ${url}`);
-            }
-
-            return response.status === 204 ? null : response.json();
+            // Writes may answer 200/201 with an empty body (→ null); errors carry the contract's { message }.
+            return readJsonResponse(response);
         },
         onSuccess: (data, variables, context) => {
             invalidateKeys?.forEach((queryKey) => queryClient.invalidateQueries({ queryKey }));

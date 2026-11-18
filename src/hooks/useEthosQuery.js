@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { readJsonResponse } from '../api/http';
 import useConfiguredEthosFetch from './useConfiguredEthosFetch';
 
 /**
@@ -16,11 +17,8 @@ export default function useEthosQuery(queryKey, url, options = {}) {
             // Data Connect pipelines answer JSON; Ellucian's examples always send Accept.
             const response = await authenticatedEthosFetch(url, { signal, headers: { Accept: 'application/json' } });
 
-            if (!response || response.status !== 200) {
-                throw new Error(`Error fetching ${url}`);
-            }
-
-            return response.json();
+            // Empty 2xx bodies resolve to null; errors carry the contract's { message }.
+            return readJsonResponse(response);
         },
         ...options,
         enabled: Boolean(url) && (options.enabled ?? true)

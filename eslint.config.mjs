@@ -38,6 +38,7 @@ export default [
         process: 'readonly',
         console: 'readonly',
         URLSearchParams: 'readonly',
+        Response: 'readonly',
       }
     },
     settings: {
