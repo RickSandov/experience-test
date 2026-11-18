@@ -1,15 +1,37 @@
 module.exports = {
     name: 'ShuferpaXmommst',
-    publisher: 'Sample',
+    publisher: 'Shu',
     cards: [{
         type: 'ShuferpaXmommstCard',
         source: './src/cards/ShuferpaXmommstCard',
-        title: 'ShuferpaXmommst Card',
-        displayCardType: 'ShuferpaXmommst Card',
-        description: 'This is an introductory card to the Ellucian Experience SDK',
+        title: 'XMOMMST Admin',
+        displayCardType: 'XMOMMST Admin',
+        description: 'Look up and manage XMOMMST access records by Banner ID.',
+        configuration: {
+            client: [
+                {
+                    key: 'writeAccessRoles',
+                    label: 'Roles with read and write access (comma-separated)',
+                    required: true
+                },
+                {
+                    key: 'readAccessRoles',
+                    label: 'Roles with read-only access (comma-separated)',
+                    required: false
+                }
+            ],
+            server: [
+                {
+                    key: 'ethosApiKey',
+                    label: 'Ethos API Key',
+                    type: 'password',
+                    required: true
+                }
+            ]
+        },
         pageRoute: {
             route: '/',
-            excludeClickSelectors: ['a']
+            excludeClickSelectors: ['a', 'button']
         }
     }],
     page: {

@@ -1,29 +1,30 @@
 import { spacing40 } from '@ellucian/react-design-system/core/styles/tokens';
-import { makeStyles, Typography, TextLink } from '@ellucian/react-design-system/core';
+import { makeStyles, Typography, Button } from '@ellucian/react-design-system/core';
+import { useCardControl } from '@ellucian/experience-extension-utils';
 import QueryProvider from '../contexts/QueryProvider';
 
-const useStyles = makeStyles()({
+const useStyles = makeStyles({ name: 'XmommstCard' })(() => ({
     card: {
-        margin: `0 ${spacing40}`,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: spacing40,
+        margin: `0 ${spacing40}`
     }
-});
+}));
 
 const ShuferpaXmommstCardContent = () => {
     const { classes } = useStyles();
+    const { navigateToPage } = useCardControl();
 
     return (
         <div className={classes.card}>
-            <Typography variant="h2">
-                Hello ShuferpaXmommst World
-            </Typography>
             <Typography>
-                <span>
-                    For sample extensions, visit the Ellucian Developer
-                </span>
-                <TextLink href="https://github.com/ellucian-developer/experience-extension-sdk-samples" target="_blank">
-                     GitHub
-                </TextLink>
+                Look up and manage XMOMMST access records by Banner ID.
             </Typography>
+            <Button id="XmommstCard_Open" onClick={() => navigateToPage({ route: '/' })}>
+                Open
+            </Button>
         </div>
     );
 };
