@@ -13,7 +13,9 @@ Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
 - `extension.js` — manifest: card entries and `page.source` (`./src/pages/router.jsx`)
 - `src/cards/` — card components, each wrapped in `QueryProvider`
 - `src/pages/` — page router (react-router v5), `Home.jsx`, segment codec
-- `src/domain/` — pure logic (format, pagination, redaction) + `*.test.mjs`
+- `src/domain/` — pure logic + `*.test.mjs`: Banner ID, access, person, record rows, form rules F1–F9 (`src/domain/recordForm.js`)
+- `src/api/endpoints.js` — pipeline names, URLs, `MOCK` flags (flip one per live pipeline)
+- `src/mocks/` — fixtures (`MOCK_IDS`: with records, none, write fails, unknown) + in-memory store
 - `src/hooks/` — Ethos/Data Connect fetch hooks (`useEthosQuery`, `useMockableEthosQuery`, …)
 - `src/contexts/QueryProvider.jsx` — one TanStack `QueryClient` per entry bundle
 - `src/components/examples/` — verified EDS usage examples; copy from them
@@ -23,7 +25,7 @@ Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
 - `npm install` (user runs it; `@ellucian/*` are CDN tarballs)
 - `npm run test:domain` — node tests, no `node_modules` needed
 - `npm run lint`
-- `npm run build-dev`
+- `npm run build-dev` (see Gotchas for the token)
 - `npm run deploy-dev` — needs `EXPERIENCE_EXTENSION_UPLOAD_TOKEN` in `.env`
 - `npm start` — live reload on port 8082
 
@@ -37,6 +39,8 @@ Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
 - Pipeline names go bare to `authenticatedEthosFetch` (no leading `/`, else `//` and a 404 preflight)
 - EDS AdvancedTable column filters need `initialState.showColumnFilters`, not the prop
 - Route params with `%` break under history v4: use `src/pages/segmentCodec.js`
+- `build-dev` without a real upload token: `EXPERIENCE_EXTENSION_UPLOAD_TOKEN= npm run build-dev` (the `.env` placeholder crashes the validator)
+- Input `pattern` compiles with the `v` flag: escape `-` in classes (`src/domain/recordForm.js` `NAME_PATTERN`)
 
 ## Pointers
 - Skill `experience-extension` (`~/.claude/skills/experience-extension/SKILL.md` and its reference folder);
