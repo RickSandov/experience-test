@@ -5,8 +5,9 @@ Read on every turn of every session in this repo: keep it under 4 KB. Point to s
 `python3 ~/.claude/roles/flowctl.py repo-doc check .`
 
 ## Purpose
-Ellucian Experience extension (card + page). Purpose not settled yet: spec pending
-(the `spec` skill writes it under docs/superpowers/specs). Nothing is deployed.
+Ellucian Experience extension (card + page) to manage Banner form XMOMMST records by
+Banner ID. Design: `docs/superpowers/specs/2026-11-18-xmommst-admin-design.md`
+(awaiting approval). Nothing is deployed.
 
 ## Map
 - `extension.js` — manifest: card entries and `page.source` (`./src/pages/router.jsx`)
@@ -38,5 +39,7 @@ Ellucian Experience extension (card + page). Purpose not settled yet: spec pendi
 - Route params with `%` break under history v4: use `src/pages/segmentCodec.js`
 
 ## Pointers
-- Skill `experience-extension` (`~/.claude/skills/experience-extension/SKILL.md` and its reference folder)
+- Skill `experience-extension` (`~/.claude/skills/experience-extension/SKILL.md` and its reference folder);
+  Copilot copy without Claude-only steps: `.github/skills/experience-extension/`
+- Pipeline samples: `../samples/` (request/response JSON and the role hook `../samples/useRoleAccess.js`)
 - API contracts: `docs/api/*.openapi.yaml` (to be written after the spec)
